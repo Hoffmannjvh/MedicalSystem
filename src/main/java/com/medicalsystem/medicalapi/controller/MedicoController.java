@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/medicos")
 @RequiredArgsConstructor
+@Tag(name = "Médicos", description = "Operações relacionadas a médicos")
 public class MedicoController {
 
     private final MedicoService medicoService;
@@ -36,7 +38,7 @@ public class MedicoController {
     @Operation(summary = "Cadastrar um novo médico", description = "Permite cadastrar um médico no sistema.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Médico cadastrado com sucesso",
-                content = @Content(mediaType = "application/json", schema = @Schema(implementation = Medico.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Medico.class))),
             @ApiResponse(responseCode = "400", description = "Erro de validação nos dados fornecidos.",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorsResponse.class)))
     })
@@ -165,7 +167,7 @@ public class MedicoController {
 
         } catch (Exception e) {
             List<String> errors = new ArrayList<>();
-            errors.add("Erro ao tentar remover o médico: " + e.getMessage());
+            errors.add("Não foi possível remover o médico. O médico está vinculado a consultas existentes. Por favor, remova as consultas relacionadas antes de tentar excluir o médico.");
             return ResponseEntity.status(500).body(new ErrorsResponse(errors));
         }
     }

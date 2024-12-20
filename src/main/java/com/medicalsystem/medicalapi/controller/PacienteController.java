@@ -2,7 +2,6 @@ package com.medicalsystem.medicalapi.controller;
 
 import com.medicalsystem.medicalapi.entity.Paciente;
 import com.medicalsystem.medicalapi.exception.InvalidDateFormatException;
-import com.medicalsystem.medicalapi.exception.MedicoNotFoundException;
 import com.medicalsystem.medicalapi.exception.PacienteNotFound;
 import com.medicalsystem.medicalapi.model.ErrorsResponse;
 import com.medicalsystem.medicalapi.service.PacienteService;
@@ -12,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/pacientes")
+@Tag(name = "Pacientes", description = "Operações relacionadas a pacientes")
 public class PacienteController {
 
     @Autowired
@@ -80,20 +81,20 @@ public class PacienteController {
             @ApiResponse(responseCode = "404", description = "Paciente não encontrado para o ID fornecido")
     })
     public ResponseEntity<Object> buscarPacientePorId(
-            @PathVariable @Parameter(description = "ID único do médico") UUID id) {
+            @PathVariable @Parameter(description = "ID único do paciente") UUID id) {
         try {
             Paciente paciente = pacienteService.buscarPacientePorId(id);
             return ResponseEntity.ok(paciente);
 
-        } catch (MedicoNotFoundException e) {
+        } catch (PacienteNotFound e) {
             List<String> errors = new ArrayList<>();
             errors.add(e.getMessage());
             return ResponseEntity.status(404).body(new ErrorsResponse(errors));
 
         } catch (Exception e) {
-            List<String> erros = new ArrayList<>();
-            erros.add("Erro interno ao buscar paciente.");
-            return ResponseEntity.status(500).body(new ErrorsResponse(erros));
+            List<String> errors = new ArrayList<>();
+            errors.add("Erro interno ao buscar paciente, verifique as informações e tente novamente.");
+            return ResponseEntity.status(500).body(new ErrorsResponse(errors));
         }
     }
 
@@ -119,7 +120,7 @@ public class PacienteController {
         try {
             Paciente paciente = pacienteService.atualizarPaciente(id, pacienteAtualizado);
             if (paciente == null) {
-                throw new PacienteNotFound("Médico não encontrado para o ID fornecido.");
+                throw new PacienteNotFound("Paciente não encontrado para o ID fornecido.");
             }
             return ResponseEntity.ok(paciente);
 
@@ -157,7 +158,7 @@ public class PacienteController {
 
         } catch (Exception e) {
             List<String> errors = new ArrayList<>();
-            errors.add("Erro ao tentar remover o médico: " + e.getMessage());
+            errors.add("Erro ao tentar remover o paciente: " + e.getMessage());
             return ResponseEntity.status(500).body(new ErrorsResponse(errors));
         }
 

@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -36,5 +37,6 @@ public class Medico {
 
 
     @NotNull(message = "Campo obrigatório: E-MAIL.")
+    @Email (message = "O e-mail informado não é válido. Por favor, insira um endereço de e-mail correto.")
     private String email;
 }

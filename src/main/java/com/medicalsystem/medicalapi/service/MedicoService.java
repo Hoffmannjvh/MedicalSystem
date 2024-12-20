@@ -3,7 +3,6 @@ package com.medicalsystem.medicalapi.service;
 import com.medicalsystem.medicalapi.entity.Medico;
 import com.medicalsystem.medicalapi.exception.MedicoException;
 import com.medicalsystem.medicalapi.exception.MedicoNotFoundException;
-import com.medicalsystem.medicalapi.exception.PacienteNotFound;
 import com.medicalsystem.medicalapi.repository.MedicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

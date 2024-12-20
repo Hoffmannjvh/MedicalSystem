@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,18 +36,39 @@ public class ConsultaService {
         }
     }
 
-    public List<Consulta> listarConsultas() {
-        try {
-            return consultaRepository.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao listar consultas: " + e.getMessage());
+    public List<Consulta> listarConsultas(UUID consultaId, UUID pacienteId, UUID medicoId) {
+        if (consultaId != null) {
+            // Busca pela consultaId
+            return consultaRepository.findById(consultaId)
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
         }
+
+        if (pacienteId != null && medicoId != null) {
+            // Busca por pacienteId e medicoId
+            return consultaRepository.findByPacienteIdAndMedicoId(pacienteId, medicoId);
+        }
+
+        if (pacienteId != null) {
+            // Busca somente por pacienteId
+            return consultaRepository.findByPacienteId(pacienteId);
+        }
+
+        if (medicoId != null) {
+            // Busca somente por medicoId
+            return consultaRepository.findByMedicoId(medicoId);
+        }
+
+        // Se nenhum filtro for fornecido, retorna todas as consultas
+        return consultaRepository.findAll();
     }
+
+
 
     public Consulta buscarConsultaPorId(UUID id) {
 
-            return consultaRepository.findById(id)
-                    .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada para o ID fornecido."));
+        return consultaRepository.findById(id)
+                .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada para o ID fornecido."));
     }
 
     @Transactional
