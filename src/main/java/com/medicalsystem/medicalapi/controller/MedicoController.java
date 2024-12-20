@@ -66,13 +66,7 @@ public class MedicoController {
             @RequestParam(required = false) @Parameter(description = "Filtrar médicos pela especialidade") String especialidade,
             @RequestParam(required = false) @Parameter(description = "Filtrar médicos pelo CRM") String crm) {
 
-        List<Medico> medicos = medicoService.listarMedicosComFiltros(nome, especialidade, crm);
-        //Validação dos campos preenchidos
-        if (medicos == null || medicos.isEmpty()) {
-            List<String> erros = new ArrayList<>();
-            erros.add("Nenhum médico encontrado com os critérios fornecidos.");
-            return ResponseEntity.status(404).body(new ErroResponse(erros));
-        }
+        List<Medico> medicos = medicoService.listarMedicos(nome, especialidade, crm);
         return ResponseEntity.ok(medicos);
     }
 

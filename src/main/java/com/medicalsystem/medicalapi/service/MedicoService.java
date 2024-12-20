@@ -1,8 +1,9 @@
 package com.medicalsystem.medicalapi.service;
 
 import com.medicalsystem.medicalapi.entity.Medico;
-import com.medicalsystem.medicalapi.exception.AgendarMedicoException;
+import com.medicalsystem.medicalapi.exception.MedicoException;
 import com.medicalsystem.medicalapi.exception.MedicoNotFoundException;
+import com.medicalsystem.medicalapi.exception.PacienteNotFound;
 import com.medicalsystem.medicalapi.repository.MedicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,18 +22,25 @@ public class MedicoService {
             return medicoRepository.save(medico);
 
         } catch (Exception e) {
-            throw new AgendarMedicoException("Erro ao salvar: " + e.getMessage());
+            throw new MedicoException("Erro ao salvar: " + e.getMessage());
         }
     }
 
-    public List<Medico> listarMedicos() {
-        List<Medico> medicos = medicoRepository.findAll();
+    public List<Medico> listarMedicos(String nome, String especialidade, String crm) {
+        List<Medico> listarMedicos;
 
-        if (medicos.isEmpty()) {
-            throw new MedicoNotFoundException("Nenhum médico encontrado no sistema.");
+        if (nome == null && especialidade == null && crm == null) {
+            return medicoRepository.findAll();
         }
 
-        return medicos;
+        listarMedicos = medicoRepository.findMedicosByFilters(nome, especialidade, crm);
+
+        if (listarMedicos.isEmpty()) {
+            throw new PacienteNotFound("Não foram encontrados registros para as consultas Nome: " + nome + " Especialidade: " + especialidade + " CRM: " + crm);
+        }
+
+        return listarMedicos;
+
     }
 
     public Medico buscarMedicoPorId(UUID id) {
@@ -58,14 +66,5 @@ public class MedicoService {
 
         medicoRepository.deleteById(id);
         return true;
-    }
-
-    public List<Medico> listarMedicosComFiltros(String nome, String especialidade, String crm) {
-        // Validar se pelo menos um filtro foi passado
-        if (nome == null && especialidade == null && crm == null) {
-            throw new IllegalArgumentException("Pelo menos um filtro (nome, especialidade ou CRM) deve ser fornecido.");
-        }
-
-        return medicoRepository.findMedicosByFilters(nome, especialidade, crm);
     }
 }

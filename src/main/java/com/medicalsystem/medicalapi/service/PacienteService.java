@@ -1,7 +1,7 @@
 package com.medicalsystem.medicalapi.service;
 
 import com.medicalsystem.medicalapi.entity.Paciente;
-import com.medicalsystem.medicalapi.exception.AgendarPacienteException;
+import com.medicalsystem.medicalapi.exception.PacienteException;
 import com.medicalsystem.medicalapi.exception.PacienteNotFound;
 import com.medicalsystem.medicalapi.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,29 +22,44 @@ public class PacienteService {
             return pacienteRepository.save(paciente);
 
         } catch (Exception e) {
-            throw new AgendarPacienteException("Erro ao salvar o paciente: " + e.getMessage());
+            throw new PacienteException("Erro ao salvar o paciente: " + e.getMessage());
         }
     }
 
     public List<Paciente> listarPacientes(String nome, String cpf) {
         List<Paciente> pacientes;
-        // Valida se os filtros estão preenchidos
+
         if (nome == null && cpf == null) {
             return pacienteRepository.findAll();
         }
 
-        if (nome != null) {
-            pacientes = pacienteRepository.findPacientesByName(nome);
-        } else {
-            pacientes = pacienteRepository.findPacientesByCPF(cpf);
+        // Verifica se o CPF contém pontuação e remove se necessário
+        if (cpf != null && cpf.matches(".*[\\.\\-\\/]")) {
+            cpf = cpf.replaceAll("[\\.\\-\\/]", "");
         }
 
+        if (nome != null && cpf != null) {
+            pacientes = pacienteRepository.findPacientesByNameAndCPF(nome, cpf); // Pesquisa exata por nome e CPF
+        } else if (nome != null) {
+            pacientes = pacienteRepository.findPacientesByName(nome); // Pesquisa apenas pelo nome
+        } else {
+            pacientes = pacienteRepository.findPacientesByCPF(cpf); // Pesquisa apenas pelo CPF
+        }
+
+        // Verifica se a lista de pacientes está vazia
         if (pacientes.isEmpty()) {
-            throw new PacienteNotFound("Não foram encontrados registros para as consultas nome: " + nome + " CPF:" + cpf);
+            if (nome != null && cpf != null) {
+                throw new PacienteNotFound("Não foram encontrados registros para o paciente com nome: " + nome + " e CPF: " + cpf);
+            } else if (cpf != null) {
+                throw new PacienteNotFound("Não foram encontrados registros para o CPF: " + cpf + ". Lembre-se de pesquisar sem pontuação.");
+            } else {
+                throw new PacienteNotFound("Não foram encontrados registros para o nome: " + nome);
+            }
         }
 
         return pacientes;
     }
+
 
     public Paciente buscarPacientePorId(UUID id) {
         return pacienteRepository.findById(id)

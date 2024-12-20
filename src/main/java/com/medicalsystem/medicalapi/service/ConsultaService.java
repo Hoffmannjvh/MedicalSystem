@@ -1,10 +1,10 @@
 package com.medicalsystem.medicalapi.service;
 
 import com.medicalsystem.medicalapi.entity.Consulta;
-import com.medicalsystem.medicalapi.entity.StatusConsulta;
-import com.medicalsystem.medicalapi.repository.ConsultaRepository;
+import com.medicalsystem.medicalapi.constant.StatusConsulta;
 import com.medicalsystem.medicalapi.exception.ConsultaAgendamentoException;
 import com.medicalsystem.medicalapi.exception.ConsultaNotFoundException;
+import com.medicalsystem.medicalapi.repository.ConsultaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -44,12 +44,9 @@ public class ConsultaService {
     }
 
     public Consulta buscarConsultaPorId(UUID id) {
-        try {
+
             return consultaRepository.findById(id)
                     .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada para o ID fornecido."));
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao buscar consulta por ID: " + e.getMessage());
-        }
     }
 
     @Transactional
@@ -58,7 +55,7 @@ public class ConsultaService {
             Consulta consulta = consultaRepository.findById(id)
                     .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada para o ID fornecido."));
             // Alterando o status para "Cancelada"
-            consulta.setStatus(StatusConsulta.CANCELADA);
+            consulta.setStatus_consulta(StatusConsulta.CANCELADA);
             consultaRepository.save(consulta);
 
         } catch (Exception e) {

@@ -14,6 +14,7 @@ public class CustomDateDeserializer extends JsonDeserializer<LocalDate> {
     private static final DateTimeFormatter FORMATTER_WITH_SLASH = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FORMATTER_WITHOUT_SLASH = DateTimeFormatter.ofPattern("ddMMyyyy");
 
+
     @Override
     public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String dateStr = p.getText().trim();
@@ -21,11 +22,13 @@ public class CustomDateDeserializer extends JsonDeserializer<LocalDate> {
         try {
             if (dateStr.contains("/")) {
                 return LocalDate.parse(dateStr, FORMATTER_WITH_SLASH);
-            } else {
+            } else if (dateStr.matches("\\d{8}")) { // Valida se tem 8 dígitos para evitar formatos inválidos
                 return LocalDate.parse(dateStr, FORMATTER_WITHOUT_SLASH);
+            } else {
+                throw new InvalidDateFormatException("Erro: Formato incorreto, digite a data no formato dd/MM/yyyy ou ddMMyyyy");
             }
         } catch (Exception e) {
-            throw new InvalidDateFormatException("Erro: Formato incorreto, digite a data no formato dd/mm/yyyy");
+            throw new InvalidDateFormatException("Erro: Formato incorreto, digite a data no formato dd/MM/yyyy ou ddMMyyyy");
         }
     }
 }

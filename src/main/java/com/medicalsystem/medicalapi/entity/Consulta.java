@@ -1,14 +1,16 @@
 package com.medicalsystem.medicalapi.entity;
 
+import com.medicalsystem.medicalapi.constant.StatusConsulta;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import javax.validation.Valid;
 
 @Setter
 @Getter
@@ -22,14 +24,14 @@ public class Consulta {
     @Schema(description = "ID único da consulta", example = "123e4567-e89b-12d3-a456-426614174000")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "medico_id", nullable = false)
     @NotNull(message = "Erro: O médico é obrigatório para agendar a consulta.")
     @Valid
     @Schema(description = "Médico responsável pela consulta.")
     private Medico medico_id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "paciente_id", nullable = false)
     @NotNull(message = "Erro: O paciente é obrigatório para agendar a consulta.")
     @Valid
@@ -41,7 +43,7 @@ public class Consulta {
     @NotNull(message = "Erro: O status da consulta é obrigatório.")
     @Enumerated(EnumType.STRING)
     @Schema(description = "Status da consulta", allowableValues = {"AGENDADA", "CANCELADA", "CONCLUIDA"})
-    private StatusConsulta status;
+    private StatusConsulta status_consulta;
 
 
 }

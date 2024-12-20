@@ -8,14 +8,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-    public interface MedicoRepository extends JpaRepository<Medico, UUID> {
+public interface MedicoRepository extends JpaRepository<Medico, UUID> {
 
     @Query("SELECT m FROM Medico m WHERE " +
-            "(m.nome LIKE %:nome% OR :nome IS NULL) AND " +
-            "(m.especialidade LIKE %:especialidade% OR :especialidade IS NULL) AND " +
-            "(m.crm LIKE %:crm% OR :crm IS NULL)")
-        List<Medico> findMedicosByFilters(@Param("nome") String nome,
-                                          @Param("especialidade") String especialidade,
-                                          @Param("crm") String crm);
+            "(m.nome LIKE %:nome%) OR " +
+            "(m.especialidade LIKE %:especialidade) OR " +
+            "(m.crm = :crm)")
+    List<Medico> findMedicosByFilters(@Param("nome") String nome,
+                                      @Param("especialidade") String especialidade,
+                                      @Param("crm") String crm);
 }
 

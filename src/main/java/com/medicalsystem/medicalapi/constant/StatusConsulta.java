@@ -1,4 +1,4 @@
-package com.medicalsystem.medicalapi.entity;
+package com.medicalsystem.medicalapi.constant;
 
 import lombok.Getter;
 

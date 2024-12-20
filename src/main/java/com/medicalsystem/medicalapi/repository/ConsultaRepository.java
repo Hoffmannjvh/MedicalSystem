@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 //Interface para o JpaRepository acessar a manipular o DB com menos códigos
-public interface ConsultaRepository extends JpaRepository <Consulta, UUID> {
-
+public interface ConsultaRepository extends JpaRepository<Consulta, UUID> {
 
 
 }

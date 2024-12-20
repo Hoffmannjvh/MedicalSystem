@@ -1,7 +1,8 @@
 package com.medicalsystem.medicalapi.model;
 
-import com.medicalsystem.medicalapi.entity.StatusConsulta;
+import com.medicalsystem.medicalapi.constant.StatusConsulta;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 

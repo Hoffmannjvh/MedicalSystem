@@ -45,7 +45,7 @@ public class ConsultaController {
             novaConsulta.setMedico_id(medico);
             novaConsulta.setPaciente_id(paciente);
             novaConsulta.setData_consulta(consultaRequest.getData_consulta());
-            novaConsulta.setStatus(consultaRequest.getStatus());
+            novaConsulta.setStatus_consulta(consultaRequest.getStatus());
             consultaService.agendarConsulta(novaConsulta);
             return ResponseEntity.status(200).body(novaConsulta);
 
@@ -78,7 +78,7 @@ public class ConsultaController {
             consultaExistente.setMedico_id(medico);
             consultaExistente.setPaciente_id(paciente);
             consultaExistente.setData_consulta(consultaRequest.getData_consulta());
-            consultaExistente.setStatus(consultaRequest.getStatus());
+            consultaExistente.setStatus_consulta(consultaRequest.getStatus());
             consultaService.atualizarConsulta(id, consultaExistente);
             return ResponseEntity.status(200).body(consultaExistente);
 
@@ -146,17 +146,11 @@ public class ConsultaController {
             consultaService.cancelarConsulta(id);
             return ResponseEntity.noContent().build();
 
-        } catch (ConsultaNotFoundException e) {
-            List<String> erros = new ArrayList<>();
-            erros.add("Consulta não encontrada.");
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(404).body(erroResponse);
-
         } catch (Exception e) {
             List<String> erros = new ArrayList<>();
-            erros.add("Erro interno ao cancelar a consulta.");
+            erros.add(e.getMessage());
             ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(500).body(erroResponse);
+            return ResponseEntity.status(400).body(erroResponse);
         }
     }
 }
