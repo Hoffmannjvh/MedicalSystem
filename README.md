@@ -45,3 +45,11 @@ spring.flyway.baseline-version=1
 ```
 
 4. No arquivo `src/main/resources/db_.migration/V1__Initial_schema.sql`, contém os SQL para rodar no banco para realizar testes caso necessário 
+
+## Como testar
+
+1. Após rodar o programa, abra seu navegador.
+2. Acesse o seguinte endereço: [http://localhost:8080/swagger-ui/index.html#/](http://localhost:8080/swagger-ui/index.html#/).
+3. Lá, você poderá testar as funcionalidades da API através da interface do Swagger.
+
+Certifique-se de que o servidor está rodando corretamente antes de acessar o link.
