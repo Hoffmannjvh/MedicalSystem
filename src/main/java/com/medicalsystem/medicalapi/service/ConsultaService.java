@@ -50,20 +50,6 @@ public class ConsultaService {
     }
 
     @Transactional
-    public void cancelarConsulta(UUID id) {
-        try {
-            Consulta consulta = consultaRepository.findById(id)
-                    .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada para o ID fornecido."));
-            // Alterando o status para "Cancelada"
-            consulta.setStatus_consulta(StatusConsulta.CANCELADA);
-            consultaRepository.save(consulta);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao tentar cancelar consulta: " + e.getMessage());
-        }
-    }
-
-    @Transactional
     public Consulta atualizarConsulta(UUID id, Consulta consultaAtualizada) {
         try {
             return consultaRepository.save(consultaAtualizada);
@@ -80,17 +66,16 @@ public class ConsultaService {
     }
 
     @Transactional
-    public void deletarConsulta(UUID id) {
+    public void cancelarConsulta(UUID id) {
         try {
-            consultaRepository.findById(id)
+            Consulta consulta = consultaRepository.findById(id)
                     .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada para o ID fornecido."));
-            consultaRepository.deleteById(id);
-
-        } catch (IllegalArgumentException e) {
-            throw new ConsultaNotFoundException("Erro ao deletar consulta: " + e.getMessage());
+            // Alterando o status para "Cancelada"
+            consulta.setStatus_consulta(StatusConsulta.CANCELADA);
+            consultaRepository.save(consulta);
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao tentar deletar consulta: " + e.getMessage());
+            throw new RuntimeException("Erro ao tentar cancelar consulta: " + e.getMessage());
         }
     }
 }

@@ -6,11 +6,12 @@ import com.medicalsystem.medicalapi.entity.Paciente;
 import com.medicalsystem.medicalapi.exception.ConsultaAgendamentoException;
 import com.medicalsystem.medicalapi.exception.ConsultaNotFoundException;
 import com.medicalsystem.medicalapi.model.ConsultaRequest;
-import com.medicalsystem.medicalapi.model.ErroResponse;
+import com.medicalsystem.medicalapi.model.ErrorsResponse;
 import com.medicalsystem.medicalapi.service.ConsultaService;
 import com.medicalsystem.medicalapi.service.MedicoService;
 import com.medicalsystem.medicalapi.service.PacienteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +35,13 @@ public class ConsultaController {
     @Operation(summary = "Agendar uma nova consulta", description = "Agende uma nova consulta entre o paciente e o médico.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Consulta agendada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos, verifique e tente novamente.")
     })
     public ResponseEntity<Object> agendarConsulta(@RequestBody ConsultaRequest consultaRequest) {
         try {
             Medico medico = medicoService.buscarMedicoPorId(consultaRequest.getMedico_id());
             Paciente paciente = pacienteService.buscarPacientePorId(consultaRequest.getPaciente_id());
+
             // Criar consulta com objetos completos
             Consulta novaConsulta = new Consulta();
             novaConsulta.setMedico_id(medico);
@@ -50,22 +52,43 @@ public class ConsultaController {
             return ResponseEntity.status(200).body(novaConsulta);
 
         } catch (ConsultaAgendamentoException e) {
-            List<String> erros = new ArrayList<>();
-            erros.add("Erro ao agendar consulta: " + e.getMessage());
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(400).body(erroResponse);
+            List<String> errors = new ArrayList<>();
+            errors.add("Erro ao agendar consulta: " + e.getMessage());
+            ErrorsResponse errorsResponse = new ErrorsResponse(errors);
+            return ResponseEntity.status(400).body(errorsResponse);
 
         } catch (Exception e) {
             List<String> erros = new ArrayList<>();
-            erros.add("Erro interno ao agendar consulta.");
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(500).body(erroResponse);
+            erros.add("Erro interno ao agendar consulta, verifique os dados e tente novamente.");
+            ErrorsResponse errorsResponse = new ErrorsResponse(erros);
+            return ResponseEntity.status(500).body(errorsResponse);
         }
     }
 
+    @GetMapping
+    @Operation(summary = "Listar todas as consultas", description = "Retorna uma lista de todas as consultas agendadas.")
+    public ResponseEntity<Object> listarConsultas() {
+        List<Consulta> consultas = consultaService.listarConsultas();
+        //Validação se a listagem retorna vazio
+        if (consultas.isEmpty()) {
+            List<String> erros = new ArrayList<>();
+            erros.add("Nenhuma consulta encontrada no sistema.");
+            ErrorsResponse errorsResponse = new ErrorsResponse(erros);
+            return ResponseEntity.status(404).body(errorsResponse);
+        }
+        return ResponseEntity.ok(consultas);
+    }
+
+
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar informações de uma consulta", description = "Atualiza os dados da consulta.")
-    public ResponseEntity<Object> atualizarConsulta(@PathVariable UUID id, @RequestBody ConsultaRequest consultaRequest) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dados da consulta atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Dados da consulta não encontrado para o ID fornecido")
+    })
+    public ResponseEntity<Object> atualizarConsulta(
+            @PathVariable @Parameter(description = "ID único do médico a ser atualizado") UUID id,
+            @RequestBody ConsultaRequest consultaRequest) {
         try {
             Consulta consultaExistente = consultaService.buscarConsultaPorId(id);
             if (consultaExistente == null) {
@@ -85,30 +108,17 @@ public class ConsultaController {
         } catch (ConsultaAgendamentoException | ConsultaNotFoundException e) {
             List<String> erros = new ArrayList<>();
             erros.add("Erro ao atualizar consulta: " + e.getMessage());
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(400).body(erroResponse);
+            ErrorsResponse errorsResponse = new ErrorsResponse(erros);
+            return ResponseEntity.status(400).body(errorsResponse);
 
         } catch (Exception e) {
             List<String> erros = new ArrayList<>();
             erros.add("Erro interno ao atualizar consulta.");
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(500).body(erroResponse);
+            ErrorsResponse errorsResponse = new ErrorsResponse(erros);
+            return ResponseEntity.status(500).body(errorsResponse);
         }
     }
 
-    @GetMapping
-    @Operation(summary = "Listar todas as consultas", description = "Retorna uma lista de todas as consultas agendadas.")
-    public ResponseEntity<Object> listarConsultas() {
-        List<Consulta> consultas = consultaService.listarConsultas();
-        //Validação se a listagem retorna vazio
-        if (consultas.isEmpty()) {
-            List<String> erros = new ArrayList<>();
-            erros.add("Nenhuma consulta encontrada no sistema.");
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(404).body(erroResponse);
-        }
-        return ResponseEntity.ok(consultas);
-    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar consulta por ID", description = "Retorna a consulta agendada pelo ID.")
@@ -127,14 +137,14 @@ public class ConsultaController {
         } catch (ConsultaNotFoundException e) {
             List<String> erros = new ArrayList<>();
             erros.add(e.getMessage());
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(404).body(erroResponse);
+            ErrorsResponse errorsResponse = new ErrorsResponse(erros);
+            return ResponseEntity.status(404).body(errorsResponse);
 
         } catch (Exception e) {
             List<String> erros = new ArrayList<>();
-            erros.add("Erro interno ao buscar consulta.");
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(500).body(erroResponse);
+            erros.add("Erro interno ao buscar consulta, verifique os dados e tente novamente.");
+            ErrorsResponse errorsResponse = new ErrorsResponse(erros);
+            return ResponseEntity.status(500).body(errorsResponse);
         }
     }
 
@@ -149,8 +159,8 @@ public class ConsultaController {
         } catch (Exception e) {
             List<String> erros = new ArrayList<>();
             erros.add(e.getMessage());
-            ErroResponse erroResponse = new ErroResponse(erros);
-            return ResponseEntity.status(400).body(erroResponse);
+            ErrorsResponse errorsResponse = new ErrorsResponse(erros);
+            return ResponseEntity.status(400).body(errorsResponse);
         }
     }
 }

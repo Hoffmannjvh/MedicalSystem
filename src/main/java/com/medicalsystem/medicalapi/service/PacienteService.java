@@ -39,11 +39,11 @@ public class PacienteService {
         }
 
         if (nome != null && cpf != null) {
-            pacientes = pacienteRepository.findPacientesByNameAndCPF(nome, cpf); // Pesquisa exata por nome e CPF
+            pacientes = pacienteRepository.findPacientesByNameAndCPF(nome, cpf);
         } else if (nome != null) {
-            pacientes = pacienteRepository.findPacientesByName(nome); // Pesquisa apenas pelo nome
+            pacientes = pacienteRepository.findPacientesByName(nome);
         } else {
-            pacientes = pacienteRepository.findPacientesByCPF(cpf); // Pesquisa apenas pelo CPF
+            pacientes = pacienteRepository.findPacientesByCPF(cpf);
         }
 
         // Verifica se a lista de pacientes está vazia

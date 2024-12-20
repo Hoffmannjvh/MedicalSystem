@@ -36,7 +36,7 @@ public class MedicoService {
         listarMedicos = medicoRepository.findMedicosByFilters(nome, especialidade, crm);
 
         if (listarMedicos.isEmpty()) {
-            throw new PacienteNotFound("Não foram encontrados registros para as consultas Nome: " + nome + " Especialidade: " + especialidade + " CRM: " + crm);
+            throw new MedicoNotFoundException("Não foram encontrados registros com os dados Nome: " + nome + " Especialidade: " + especialidade + " CRM: " + crm);
         }
 
         return listarMedicos;

@@ -7,11 +7,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ErroResponse {
+public class ErrorsResponse {
 
     private List<String> errors;
 
-    public ErroResponse(List<String> errors) {
+    public ErrorsResponse(List<String> errors) {
         this.errors = errors;
     }
 
